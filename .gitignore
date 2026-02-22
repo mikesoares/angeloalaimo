@@ -1,0 +1,21 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.local
+.env*.local
+*.pem
+
+# Claude Code
+.claude/
+
+# User-provided staging files
+tmp/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

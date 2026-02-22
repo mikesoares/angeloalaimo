@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angelo Alaimo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      width: min(80vmin, 400px);
+      aspect-ratio: 1;
+      gap: 0;
+    }
+
+    .quadrant {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .blue {
+      background: #9AC5E8;
+      border-radius: 70% 0 0 0;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .blue:hover {
+      background: #7AADD0;
+      transform: scale(1.05);
+      z-index: 1;
+    }
+
+    .blue:hover .label {
+      opacity: 1;
+    }
+
+    .blue:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: -6px;
+    }
+
+    .green-tr { background: #A5D6A0; border-radius: 0 70% 0 0; }
+    .green-bl { background: #A5D6A0; border-radius: 0 0 0 70%; }
+    .coral    { background: #E8908A; border-radius: 0 0 70% 0; }
+
+    .label {
+      position: absolute;
+      top: 60%;
+      left: 54%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      font-size: 0.9rem;
+      font-weight: 200;
+      letter-spacing: 0.05em;
+      text-transform: lowercase;
+      transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <a href="https://www.linkedin.com/in/alaimo-angelo/" target="_blank" rel="noopener noreferrer" class="quadrant blue" aria-label="LinkedIn">
+      <span class="label">linkedin</span>
+    </a>
+    <div class="quadrant green-tr" aria-hidden="true"></div>
+    <div class="quadrant green-bl" aria-hidden="true"></div>
+    <div class="quadrant coral" aria-hidden="true"></div>
+  </div>
+</body>
+</html>
