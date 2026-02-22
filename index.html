@@ -42,7 +42,7 @@
       border-radius: 70% 0 0 0;
       cursor: pointer;
       position: relative;
-      transition: background-color 0.2s, transform 0.2s;
+      transition: background-color 0.4s, transform 0.4s;
     }
 
     /* .auto-hover mirrors :hover — keep them in the same rule so
@@ -55,9 +55,19 @@
       z-index: 1;
     }
 
+    /* Slower rise/fall for the idle animation so it feels organic.
+       Real :hover keeps the snappier 0.4s from the .blue base rule. */
+    .blue.auto-hover {
+      transition: background-color 0.6s ease, transform 0.6s ease;
+    }
+
     .blue:hover .label,
     .blue.auto-hover .label {
       opacity: 1;
+    }
+
+    .blue.auto-hover .label {
+      transition: opacity 0.6s ease;
     }
 
     .blue:focus-visible {
@@ -79,7 +89,7 @@
       font-weight: 200;
       letter-spacing: 0.05em;
       text-transform: lowercase;
-      transition: opacity 0.2s;
+      transition: opacity 0.4s;
     }
 
     @media (prefers-reduced-motion: reduce) {
