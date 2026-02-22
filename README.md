@@ -50,4 +50,4 @@ angeloalaimo/
 
 ## License
 
-MIT
+Private — all rights reserved.
