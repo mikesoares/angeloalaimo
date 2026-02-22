@@ -29,23 +29,26 @@ No install, build, lint, or test commands.
 
 ## Building & Deployment
 
-No build step — the project is a single static HTML file.
+No build step — static files served as-is.
 
 ```bash
 # Deploy to production
-rsync -avz -e "ssh -p 4947" index.html angeloal_deploy@ispeakofcake.com:/web/
+rsync -avz -e "ssh -p 4947" index.html favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/
 ```
 
 ## Project Structure
 
 ```
 angeloalaimo/
-├── index.html    # Single-page landing (HTML + inline CSS + inline JS)
+├── index.html          # Single-page landing (HTML + inline CSS + inline JS)
+├── favicon.svg         # Vector favicon (modern browsers)
+├── favicon.ico         # Multi-size ICO (16/32/48px, legacy browsers)
+├── apple-touch-icon.png # 180x180 PNG (iOS home screen)
 ├── .gitignore
 ├── CLAUDE.md
 ├── README.md
 ├── TODOS.md
-└── tmp/          # User-provided staging files (gitignored)
+└── tmp/                # User-provided staging files (gitignored)
 ```
 
 ## License

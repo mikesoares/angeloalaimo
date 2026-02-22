@@ -21,12 +21,15 @@ Single-page static landing page for Angelo Alaimo. A centered rounded square div
 
 ```
 angeloalaimo/
-├── index.html    # Single-page landing (HTML + inline CSS + inline JS)
+├── index.html          # Single-page landing (HTML + inline CSS + inline JS)
+├── favicon.svg         # Vector favicon (modern browsers)
+├── favicon.ico         # Multi-size ICO (16/32/48px, legacy browsers)
+├── apple-touch-icon.png # 180x180 PNG (iOS home screen)
 ├── .gitignore
 ├── CLAUDE.md
 ├── README.md
 ├── TODOS.md
-└── tmp/          # User-provided staging files (gitignored)
+└── tmp/                # User-provided staging files (gitignored)
 ```
 
 ## Development Commands
@@ -112,6 +115,20 @@ An inline `<script>` IIFE (~110 lines) at the end of `<body>` draws attention to
 
 **Reduced motion:** Checks `matchMedia('(prefers-reduced-motion: reduce)')` at load time and listens for runtime changes. When active: no idle timer, no animation. CSS also suppresses transforms/transitions as defense-in-depth.
 
+### Favicon
+
+Three favicon formats cover all browsers:
+
+| File | Size | Format | Purpose |
+|------|------|--------|---------|
+| `favicon.svg` | 64x64 viewBox | SVG | Modern browsers (scalable, preferred) |
+| `favicon.ico` | 16/32/48px | ICO | Legacy browsers |
+| `apple-touch-icon.png` | 180x180 | PNG | iOS home screen bookmarks |
+
+The favicon reproduces the 2x2 grid layout using the exact design token colors (blue, green, green, coral) with 70% rounded corners on each outer edge and a transparent background. The SVG uses `<path>` elements with arc commands for the rounded corners. The ICO and PNG were generated from Pillow using `pieslice` + rectangles to reconstruct the same shape at raster sizes.
+
+**Regenerating raster favicons:** If design token colors change, regenerate the ICO and PNG. The SVG can be edited by hand (just update `fill` attributes). For the raster files, use a Python script with Pillow — see git history for the generation approach.
+
 ## Deployment
 
 Deployed via rsync to a chroot jail on ispeakofcake.com.
@@ -125,7 +142,7 @@ Deployed via rsync to a chroot jail on ispeakofcake.com.
 | Method | rsync over SSH |
 
 ```bash
-rsync -avz -e "ssh -p 4947" index.html angeloal_deploy@ispeakofcake.com:/web/
+rsync -avz -e "ssh -p 4947" index.html favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/
 ```
 
 ## Commit Workflow Overrides
@@ -134,4 +151,4 @@ These fill the placeholder slots in the root commit workflow.
 
 **Step 2 — Build and verify:** No build step. Verify by opening `index.html` in a browser and confirming the layout, colors, hover effect, and LinkedIn link work correctly.
 
-**Step 10 — Deploy:** `rsync -avz -e "ssh -p 4947" index.html angeloal_deploy@ispeakofcake.com:/web/`
+**Step 10 — Deploy:** `rsync -avz -e "ssh -p 4947" index.html favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/`

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Top-left: Blue with 70% top-left radius (70% of 32px = ~22px) -->
+  <path d="M22,0 H32 V32 H0 V22 A22,22 0 0 1 22,0 Z" fill="#9AC5E8"/>
+  <!-- Top-right: Green with 70% top-right radius -->
+  <path d="M32,0 H42 A22,22 0 0 1 64,22 V32 H32 V0 Z" fill="#A5D6A0"/>
+  <!-- Bottom-left: Green with 70% bottom-left radius -->
+  <path d="M0,32 H32 V64 H22 A22,22 0 0 1 0,42 V32 Z" fill="#A5D6A0"/>
+  <!-- Bottom-right: Coral with 70% bottom-right radius -->
+  <path d="M32,32 H64 V42 A22,22 0 0 1 42,64 H32 V32 Z" fill="#E8908A"/>
+</svg>
