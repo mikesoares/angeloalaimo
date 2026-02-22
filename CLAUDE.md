@@ -14,14 +14,14 @@ Single-page static landing page for Angelo Alaimo. A centered rounded square div
 |-------|-----------|
 | Markup | HTML5 |
 | Styling | CSS3 (inline) |
-| JavaScript | None |
+| JavaScript | Vanilla ES5 (inline, ~110 lines) |
 | Build | None (static files) |
 
 ## Project Structure
 
 ```
 angeloalaimo/
-├── index.html    # Single-page landing (HTML + inline CSS, no JS)
+├── index.html    # Single-page landing (HTML + inline CSS + inline JS)
 ├── .gitignore
 ├── CLAUDE.md
 ├── README.md
@@ -69,7 +69,7 @@ Width is `min(80vmin, 400px)` with `aspect-ratio: 1` and explicit `grid-template
 ### Quadrant Elements
 
 - The active LinkedIn quadrant is an `<a>` tag (semantic navigation). Future active quadrants should also use `<a>` when they get links.
-- Inactive quadrants are `<div aria-hidden="true">`. When activating a quadrant: change it to `<a href="..." target="_blank" rel="noopener noreferrer" class="quadrant {color}" aria-label="{Label}">`, add a `<span class="label">{Label}</span>` inside, and add hover/focus CSS matching the `.blue` pattern.
+- Inactive quadrants are `<div aria-hidden="true">`. When activating a quadrant: change it to `<a href="..." target="_blank" rel="noopener noreferrer" class="quadrant {color}" aria-label="{Label}">`, add a `<span class="label">{Label}</span>` inside, add hover/focus CSS matching the `.blue` pattern, and include `.{color}.auto-hover` compound selectors alongside `:hover` for auto-hover compatibility. The JS idle animation discovers active quadrants via `a.quadrant[href]`, so no JS changes are needed.
 - Top-right and bottom-left share the same green color (`#A5D6A0`). They use separate classes (`.green-tr`, `.green-bl`) only because each needs a different `border-radius` corner.
 - The hover effect uses `scale(1.05)` (not `translateY`), so it generalizes to any quadrant position.
 - Label text is white, lowercase, Helvetica Neue thin (font-weight: 200). Visible only on hover when the background darkens — this maintains WCAG AA contrast.
@@ -84,6 +84,33 @@ Width is `min(80vmin, 400px)` with `aspect-ratio: 1` and explicit `grid-template
 - `focus-visible` outline (3px solid white, offset -6px) provides keyboard navigation visibility on the blue background.
 - Inactive quadrants use `aria-hidden="true"` — they are purely decorative and don't confuse screen readers.
 - The `<a>` tag has `aria-label="LinkedIn"` for screen reader context.
+- `@media (prefers-reduced-motion: reduce)` suppresses `transform` and `transition` on hover/auto-hover states. The JS idle animation also checks `matchMedia` and disables itself entirely when reduced motion is preferred.
+
+### Idle Auto-Hover Animation
+
+An inline `<script>` IIFE (~110 lines) at the end of `<body>` draws attention to active links when the user is idle. No external dependencies.
+
+**How it works:** After `IDLE_TIMEOUT` ms of no interaction, the script cycles through each active quadrant by adding an `.auto-hover` CSS class (which mirrors `:hover` via compound selectors). Each quadrant is highlighted for `HOLD_DURATION` ms, then the class moves to the next. After one full cycle, it pauses for `CYCLE_PAUSE` ms, then restarts.
+
+**Timing constants** (at the top of the IIFE):
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `IDLE_TIMEOUT` | 4000ms | Idle time before animation starts |
+| `HOLD_DURATION` | 2000ms | Time each quadrant stays highlighted |
+| `CYCLE_PAUSE` | 3000ms | Pause after completing one full cycle |
+
+**Why IDLE_TIMEOUT > CYCLE_PAUSE:** Creates a perceptible difference between "pause between cycles" and "restart after user interaction."
+
+**Active quadrant discovery:** `grid.querySelectorAll('a.quadrant[href]')`. Uses the existing convention that active = `<a>`, inactive = `<div>`. DOM order matches visual order (TL → TR → BL → BR). When a new quadrant is activated, it automatically joins the cycle — zero JS changes needed.
+
+**Idle detection events:** `mousemove`, `pointerdown`, `keydown` on `document`; `focusin` on `.grid`. Any interaction immediately cancels the animation (removes `.auto-hover`, clears all timers) and restarts the idle timer. Both `.auto-hover` and `:hover` apply identical styles, so any momentary overlap during cancellation is invisible.
+
+**CSS `.auto-hover` pattern:** Hover rules use compound selectors (e.g., `.blue:hover, .blue.auto-hover { ... }`). This keeps a single source of truth for hover visuals. When activating a new quadrant's hover CSS, always include the `.auto-hover` compound.
+
+**Page Visibility:** Animation pauses when the tab is hidden and restarts the idle timer when visible (only if reduced motion is not active).
+
+**Reduced motion:** Checks `matchMedia('(prefers-reduced-motion: reduce)')` at load time and listens for runtime changes. When active: no idle timer, no animation. CSS also suppresses transforms/transitions as defense-in-depth.
 
 ## Deployment
 

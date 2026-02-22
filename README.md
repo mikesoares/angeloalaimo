@@ -8,7 +8,7 @@ Static landing page for Angelo Alaimo. A centered rounded square divided into 4 
 |-------|-----------|
 | Markup | HTML5 |
 | Styling | CSS3 (inline) |
-| JavaScript | None |
+| JavaScript | Vanilla ES5 (inline) |
 | Build | None (static files) |
 
 ## Requirements
@@ -40,7 +40,7 @@ rsync -avz -e "ssh -p 4947" index.html angeloal_deploy@ispeakofcake.com:/web/
 
 ```
 angeloalaimo/
-├── index.html    # Single-page landing (HTML + inline CSS, no JS)
+├── index.html    # Single-page landing (HTML + inline CSS + inline JS)
 ├── .gitignore
 ├── CLAUDE.md
 ├── README.md

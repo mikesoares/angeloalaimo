@@ -45,13 +45,18 @@
       transition: background-color 0.2s, transform 0.2s;
     }
 
-    .blue:hover {
+    /* .auto-hover mirrors :hover — keep them in the same rule so
+       hover visuals stay in sync. JS toggles .auto-hover for the
+       idle animation; CSS :hover handles real user interaction. */
+    .blue:hover,
+    .blue.auto-hover {
       background: #7AADD0;
       transform: scale(1.05);
       z-index: 1;
     }
 
-    .blue:hover .label {
+    .blue:hover .label,
+    .blue.auto-hover .label {
       opacity: 1;
     }
 
@@ -76,6 +81,17 @@
       text-transform: lowercase;
       transition: opacity 0.2s;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blue:hover,
+      .blue.auto-hover {
+        transform: none;
+        transition: none;
+      }
+      .label {
+        transition: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -87,5 +103,117 @@
     <div class="quadrant green-bl" aria-hidden="true"></div>
     <div class="quadrant coral" aria-hidden="true"></div>
   </div>
+  <script>
+  (function () {
+    'use strict';
+
+    // Idle auto-hover: cycles through active quadrants when the user
+    // hasn't interacted for a few seconds, drawing attention to links.
+
+    var IDLE_TIMEOUT = 4000;   // ms before auto-hover starts
+    var HOLD_DURATION = 2000;  // ms each quadrant stays highlighted
+    var CYCLE_PAUSE = 3000;    // ms pause after one full cycle
+
+    var grid = document.querySelector('.grid');
+    var idleTimer = null;
+    var cycleTimer = null;
+    var currentIndex = -1;
+    var isAnimating = false;
+
+    // Active quadrants are <a> tags with href (per project convention).
+    // DOM order matches visual order: TL, TR, BL, BR.
+    function getActiveQuadrants() {
+      return grid.querySelectorAll('a.quadrant[href]');
+    }
+
+    function clearAutoHover() {
+      var all = grid.querySelectorAll('.quadrant');
+      for (var i = 0; i < all.length; i++) {
+        all[i].classList.remove('auto-hover');
+      }
+    }
+
+    function stopAnimation() {
+      isAnimating = false;
+      currentIndex = -1;
+      clearTimeout(cycleTimer);
+      cycleTimer = null;
+      clearAutoHover();
+    }
+
+    function scheduleNext(delay) {
+      cycleTimer = setTimeout(function () {
+        if (isAnimating) showNext();
+      }, delay);
+    }
+
+    function showNext() {
+      var active = getActiveQuadrants();
+      if (active.length === 0) return;
+
+      clearAutoHover();
+      currentIndex++;
+
+      if (currentIndex >= active.length) {
+        // Completed one full cycle — pause, then restart
+        currentIndex = -1;
+        scheduleNext(CYCLE_PAUSE);
+        return;
+      }
+
+      active[currentIndex].classList.add('auto-hover');
+      scheduleNext(HOLD_DURATION);
+    }
+
+    function startAnimation() {
+      var active = getActiveQuadrants();
+      if (active.length === 0) return;
+      isAnimating = true;
+      currentIndex = -1;
+      showNext();
+    }
+
+    // Immediately cancel animation and restart idle timer.
+    // Clears all pending timeouts and removes .auto-hover so the
+    // user's real :hover takes over cleanly (both apply identical
+    // styles, so any momentary overlap is invisible).
+    function resetIdleTimer() {
+      if (isAnimating) stopAnimation();
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(startAnimation, IDLE_TIMEOUT);
+    }
+
+    // --- Event listeners ---
+    // mousemove on document covers all mouse activity (including grid entry).
+    document.addEventListener('mousemove', resetIdleTimer);
+    document.addEventListener('pointerdown', resetIdleTimer);
+    document.addEventListener('keydown', resetIdleTimer);
+    grid.addEventListener('focusin', resetIdleTimer);
+
+    // Respect prefers-reduced-motion at runtime (not just load time).
+    var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Fully shut down: stop animation and cancel idle timer.
+    function shutdown() {
+      stopAnimation();
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) shutdown();
+      else if (!motionQuery.matches) resetIdleTimer();
+    });
+    motionQuery.addEventListener('change', function () {
+      if (motionQuery.matches) shutdown();
+      else resetIdleTimer();
+    });
+
+    // Initialize: start idle timer unless reduced motion is active.
+    if (!motionQuery.matches) {
+      idleTimer = setTimeout(startAnimation, IDLE_TIMEOUT);
+    }
+  })();
+  </script>
 </body>
 </html>
