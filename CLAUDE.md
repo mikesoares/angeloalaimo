@@ -14,7 +14,7 @@ Single-page static landing page for Angelo Alaimo. A centered rounded square div
 |-------|-----------|
 | Markup | HTML5 |
 | Styling | CSS3 (inline) |
-| JavaScript | Vanilla ES5 (inline, ~110 lines) |
+| JavaScript | Vanilla ES5 (inline, ~120 lines) |
 | Build | None (static files) |
 
 ## Project Structure
@@ -114,6 +114,20 @@ An inline `<script>` IIFE (~110 lines) at the end of `<body>` draws attention to
 **Page Visibility:** Animation pauses when the tab is hidden and restarts the idle timer when visible (only if reduced motion is not active).
 
 **Reduced motion:** Checks `matchMedia('(prefers-reduced-motion: reduce)')` at load time and listens for runtime changes. When active: no idle timer, no animation. CSS also suppresses transforms/transitions as defense-in-depth.
+
+### Entrance Animation (Swirl-In)
+
+On page load, quadrants swirl into place from the center of the grid — starting at `scale(0) rotate(-90deg)` and animating to their final position. Each quadrant's `transform-origin` is set to its inner corner (center of the grid) so they fan outward.
+
+**CSS class pattern:** Quadrants start with an `.entering` class in the HTML markup. This class carries the `animation` and per-quadrant `transform-origin`. JS removes `.entering` via an `animationend` listener so that `transform-origin` reverts to `center center` — required for the hover `scale(1.05)` to look correct.
+
+**Why not `animation-fill-mode: forwards`:** `forwards` keeps the final keyframe's `transform: scale(1) rotate(0deg)` applied permanently, which overrides the hover `transform: scale(1.05)`. Using `backwards` instead only applies the `from` keyframe during the stagger delay (keeping quadrants invisible until their turn), then reverts to normal CSS after completion.
+
+**Stagger order:** Clockwise — TL (0ms) → TR (80ms) → BR (160ms) → BL (240ms) — not DOM order (TL → TR → BL → BR). This creates a spiral visual. Total animation time: ~0.84s, well under the 4s idle timeout so no JS timing adjustments are needed.
+
+**Easing:** `cubic-bezier(0.34, 1.56, 0.64, 1)` — slight elastic overshoot for a playful feel.
+
+**Reduced motion:** `animation: none` inside `@media (prefers-reduced-motion: reduce)` makes quadrants appear instantly.
 
 ### Favicon
 

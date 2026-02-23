@@ -95,7 +95,32 @@
       transition: opacity 0.4s;
     }
 
+    @keyframes swirl-in {
+      from {
+        transform: scale(0) rotate(-90deg);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    .quadrant.entering {
+      animation: swirl-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    /* Stagger order is clockwise (TL → TR → BR → BL) for a spiral effect.
+       transform-origin at each quadrant's inner corner so they fan out from center.
+       JS removes .entering on animationend to restore center origin for hover. */
+    .blue.entering     { transform-origin: bottom right; animation-delay: 0ms; }
+    .green-tr.entering { transform-origin: bottom left;  animation-delay: 80ms; }
+    .coral.entering    { transform-origin: top left;     animation-delay: 160ms; }
+    .green-bl.entering { transform-origin: top right;    animation-delay: 240ms; }
+
     @media (prefers-reduced-motion: reduce) {
+      .quadrant.entering {
+        animation: none;
+      }
       .blue:hover,
       .blue.auto-hover {
         transform: none;
@@ -109,12 +134,12 @@
 </head>
 <body>
   <div class="grid">
-    <a href="https://www.linkedin.com/in/alaimo-angelo/" target="_blank" rel="noopener noreferrer" class="quadrant blue" aria-label="LinkedIn">
+    <a href="https://www.linkedin.com/in/alaimo-angelo/" target="_blank" rel="noopener noreferrer" class="quadrant blue entering" aria-label="LinkedIn">
       <span class="label">linkedin</span>
     </a>
-    <div class="quadrant green-tr" aria-hidden="true"></div>
-    <div class="quadrant green-bl" aria-hidden="true"></div>
-    <div class="quadrant coral" aria-hidden="true"></div>
+    <div class="quadrant green-tr entering" aria-hidden="true"></div>
+    <div class="quadrant green-bl entering" aria-hidden="true"></div>
+    <div class="quadrant coral entering" aria-hidden="true"></div>
   </div>
   <script>
   (function () {
@@ -128,6 +153,16 @@
     var CYCLE_PAUSE = 3000;    // ms pause after one full cycle
 
     var grid = document.querySelector('.grid');
+
+    // Remove .entering after swirl-in animation completes so
+    // transform-origin reverts to center (needed for hover scale).
+    var allQuadrants = grid.querySelectorAll('.quadrant');
+    for (var i = 0; i < allQuadrants.length; i++) {
+      allQuadrants[i].addEventListener('animationend', function () {
+        this.classList.remove('entering');
+      });
+    }
+
     var idleTimer = null;
     var cycleTimer = null;
     var currentIndex = -1;
