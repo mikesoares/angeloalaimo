@@ -22,6 +22,7 @@ Single-page static landing page for Angelo Alaimo. A centered rounded square div
 ```
 angeloalaimo/
 ├── index.html          # Single-page landing (HTML + inline CSS + inline JS)
+├── .htaccess           # Apache config: disable directory listings, force HTTPS, www→non-www redirect
 ├── favicon.svg         # Vector favicon (modern browsers)
 ├── favicon.ico         # Multi-size ICO (16/32/48px, legacy browsers)
 ├── apple-touch-icon.png # 180x180 PNG (iOS home screen)
@@ -143,6 +144,26 @@ The favicon reproduces the 2x2 grid layout using the exact design token colors (
 
 **Regenerating raster favicons:** If design token colors change, regenerate the ICO and PNG. The SVG can be edited by hand (just update `fill` attributes). For the raster files, use a Python script with Pillow — see git history for the generation approach.
 
+### .htaccess Files
+
+Two `.htaccess` files control server behavior — one in the repo (root), one only on the remote (blog):
+
+**`/web/.htaccess`** (tracked in repo, deployed via rsync):
+- `Options -Indexes` — disables directory listings
+- www → non-www 301 redirect (captures host via `%1` backreference)
+- HTTP → HTTPS 301 redirect
+- www rule is first so `http://www.` gets a single redirect to `https://` sans-www
+
+**`/web/blog/.htaccess`** (remote-only, not in repo):
+- `Options -Indexes` + Basic Auth (password-protected)
+- WP Captcha Firewall (bot/spam user-agent and referer blocking)
+- WordPress permalink rewrites (`RewriteBase /blog/`)
+- `HTTP_AUTHORIZATION` passthrough (needed for Basic Auth + WP)
+- xmlrpc.php block
+- cPanel PHP 8.3 handler
+
+**Why two files:** The root serves a static landing page — it only needs SSL and directory listing protection. All WordPress/PHP rules are scoped to `/web/blog/` where the WordPress install lives. This separation keeps the static site's config minimal and avoids loading WordPress rewrite rules for every request to the root.
+
 ## Deployment
 
 Deployed via rsync to a chroot jail on ispeakofcake.com.
@@ -156,7 +177,7 @@ Deployed via rsync to a chroot jail on ispeakofcake.com.
 | Method | rsync over SSH |
 
 ```bash
-rsync -avz -e "ssh -p 4947" index.html favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/
+rsync -avz -e "ssh -p 4947" index.html .htaccess favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/
 ```
 
 ## Commit Workflow Overrides
@@ -165,4 +186,4 @@ These fill the placeholder slots in the root commit workflow.
 
 **Step 2 — Build and verify:** No build step. Verify by opening `index.html` in a browser and confirming the layout, colors, hover effect, and LinkedIn link work correctly.
 
-**Step 10 — Deploy:** `rsync -avz -e "ssh -p 4947" index.html favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/`
+**Step 10 — Deploy:** `rsync -avz -e "ssh -p 4947" index.html .htaccess favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/`
