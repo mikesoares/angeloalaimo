@@ -1,6 +1,6 @@
 # angeloalaimo
 
-Static landing page for Angelo Alaimo. A centered rounded square divided into 4 colored quadrant buttons — currently the LinkedIn quadrant (top-left, blue) is active.
+Static landing page for Angelo Alaimo. A centered rounded square divided into 4 colored quadrant buttons — currently the LinkedIn quadrant (top-left, blue) is active; the other three are placeholder slots for future links.
 
 ## Tech Stack
 
@@ -8,7 +8,7 @@ Static landing page for Angelo Alaimo. A centered rounded square divided into 4 
 |-------|-----------|
 | Markup | HTML5 |
 | Styling | CSS3 (inline) |
-| JavaScript | Vanilla ES5 (inline) |
+| JavaScript | Vanilla ES5 (inline, ~120 lines) |
 | Build | None (static files) |
 
 ## Requirements
@@ -29,7 +29,15 @@ No install, build, lint, or test commands.
 
 ## Building & Deployment
 
-No build step — static files served as-is.
+No build step — static files served as-is. Deployed via rsync to a chroot jail on ispeakofcake.com.
+
+| Setting | Value |
+|---------|-------|
+| Host | ispeakofcake.com |
+| Port | 4947 |
+| User | angeloal_deploy |
+| Web root | /web |
+| Method | rsync over SSH |
 
 ```bash
 # Deploy to production

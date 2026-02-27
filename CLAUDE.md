@@ -1,45 +1,6 @@
-# angeloalaimo
+# Angelo Alaimo
 
-## Additional Context
-
-Read `README.md` and `TODOS.md` at the project root for broader project context, current backlog, and planned work.
-
-## Project Overview
-
-Single-page static landing page for Angelo Alaimo. A centered rounded square divided into 4 colored quadrant buttons. Currently only the top-left (LinkedIn) quadrant is active; the other three are placeholder slots for future links.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Markup | HTML5 |
-| Styling | CSS3 (inline) |
-| JavaScript | Vanilla ES5 (inline, ~120 lines) |
-| Build | None (static files) |
-
-## Project Structure
-
-```
-angeloalaimo/
-├── index.html          # Single-page landing (HTML + inline CSS + inline JS)
-├── .htaccess           # Apache config: disable directory listings, force HTTPS, www→non-www redirect
-├── favicon.svg         # Vector favicon (modern browsers)
-├── favicon.ico         # Multi-size ICO (16/32/48px, legacy browsers)
-├── apple-touch-icon.png # 180x180 PNG (iOS home screen)
-├── .gitignore
-├── CLAUDE.md
-├── README.md
-├── TODOS.md
-└── tmp/                # User-provided staging files (gitignored)
-```
-
-## Development Commands
-
-```bash
-open index.html                    # Open in default browser (macOS)
-python3 -m http.server 8321       # Optional: serve locally for testing
-# No build, lint, or test commands — static HTML
-```
+@README.md
 
 ## Architecture / Key Patterns
 
@@ -106,7 +67,7 @@ An inline `<script>` IIFE (~110 lines) at the end of `<body>` draws attention to
 
 **Why IDLE_TIMEOUT > CYCLE_PAUSE:** Creates a perceptible difference between "pause between cycles" and "restart after user interaction."
 
-**Active quadrant discovery:** `grid.querySelectorAll('a.quadrant[href]')`. Uses the existing convention that active = `<a>`, inactive = `<div>`. DOM order matches visual order (TL → TR → BL → BR). When a new quadrant is activated, it automatically joins the cycle — zero JS changes needed.
+**Active quadrant discovery:** `grid.querySelectorAll('a.quadrant[href]')`. Uses the existing convention that active = `<a>`, inactive = `<div>`. DOM order matches visual order (TL -> TR -> BL -> BR). When a new quadrant is activated, it automatically joins the cycle — zero JS changes needed.
 
 **Idle detection events:** `mousemove`, `pointerdown`, `keydown` on `document`; `focusin` on `.grid`. Any interaction immediately cancels the animation (removes `.auto-hover`, clears all timers) and restarts the idle timer. Both `.auto-hover` and `:hover` apply identical styles, so any momentary overlap during cancellation is invisible.
 
@@ -124,7 +85,7 @@ On page load, quadrants swirl into place from the center of the grid — startin
 
 **Why not `animation-fill-mode: forwards`:** `forwards` keeps the final keyframe's `transform: scale(1) rotate(0deg)` applied permanently, which overrides the hover `transform: scale(1.05)`. Using `backwards` instead only applies the `from` keyframe during the stagger delay (keeping quadrants invisible until their turn), then reverts to normal CSS after completion.
 
-**Stagger order:** Clockwise — TL (0ms) → TR (80ms) → BR (160ms) → BL (240ms) — not DOM order (TL → TR → BL → BR). This creates a spiral visual. Total animation time: ~0.84s, well under the 4s idle timeout so no JS timing adjustments are needed.
+**Stagger order:** Clockwise — TL (0ms) -> TR (80ms) -> BR (160ms) -> BL (240ms) — not DOM order (TL -> TR -> BL -> BR). This creates a spiral visual. Total animation time: ~0.84s, well under the 4s idle timeout so no JS timing adjustments are needed.
 
 **Easing:** `cubic-bezier(0.34, 1.56, 0.64, 1)` — slight elastic overshoot for a playful feel.
 
@@ -150,8 +111,8 @@ Two `.htaccess` files control server behavior — one in the repo (root), one on
 
 **`/web/.htaccess`** (tracked in repo, deployed via rsync):
 - `Options -Indexes` — disables directory listings
-- www → non-www 301 redirect (captures host via `%1` backreference)
-- HTTP → HTTPS 301 redirect
+- www -> non-www 301 redirect (captures host via `%1` backreference)
+- HTTP -> HTTPS 301 redirect
 - www rule is first so `http://www.` gets a single redirect to `https://` sans-www
 
 **`/web/blog/.htaccess`** (remote-only, not in repo):
@@ -163,22 +124,6 @@ Two `.htaccess` files control server behavior — one in the repo (root), one on
 - cPanel PHP 8.3 handler
 
 **Why two files:** The root serves a static landing page — it only needs SSL and directory listing protection. All WordPress/PHP rules are scoped to `/web/blog/` where the WordPress install lives. This separation keeps the static site's config minimal and avoids loading WordPress rewrite rules for every request to the root.
-
-## Deployment
-
-Deployed via rsync to a chroot jail on ispeakofcake.com.
-
-| Setting | Value |
-|---------|-------|
-| Host | ispeakofcake.com |
-| Port | 4947 |
-| User | angeloal_deploy |
-| Web root | /web |
-| Method | rsync over SSH |
-
-```bash
-rsync -avz -e "ssh -p 4947" index.html .htaccess favicon.svg favicon.ico apple-touch-icon.png angeloal_deploy@ispeakofcake.com:/web/
-```
 
 ## Commit Workflow Overrides
 
